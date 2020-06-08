@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Zoom</title>
+</head>
+
+<body>
+    <h1>Emisión en directo</h1>
+    <button id="btn">Emitir</button>
+    <video id="video" src="" style="width: 800px; height: 600px;" autoplay="true"></video>
+    <canvas id="preview"></canvas>
+    <div id="status"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const canvas = document.getElementById('preview')
+        canvas.width = 512
+        canvas.height = 384
+        const context = canvas.getContext('2d')
+        context.width = canvas.width
+        context.height = canvas.height
+        const btn = document.getElementById('btn')
+        const video = document.getElementById('video')
+        const socket = io()
+        function publicarMensaje(msg) {
+            document.getElementById('status').innerHTML = msg
+        }
+        function cargarCamara(stream) {
+            video.srcObject = stream
+            publicarMensaje('camara funcionando')
+        }
+        function errorCamara() {
+            publicarMensaje('camara no encontrada')
+        }
+        function verVideo(video, context) {
+            context.drawImage(video, 0, 0, context.width, context.height)
+            socket.emit('stream', canvas.toDataURL('image/webp'))
+        }
+        btn.addEventListener('click', () => {
+            navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetuserMedia || navigator.mozGetuserMedia || navigator.msgGetUserMedia)
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia({ video: true }, cargarCamara, errorCamara)
+            }
+            let intervalo = setInterval(() => {
+                verVideo(video, context)
+            }, 500);
+        })
+    </script>
+</body>
+
+</html>

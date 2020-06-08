@@ -18,6 +18,7 @@
         const canvas = document.getElementById('preview')
         canvas.width = 512
         canvas.height = 384
+        canvas.style.display = none
         const context = canvas.getContext('2d')
         context.width = canvas.width
         context.height = canvas.height
@@ -45,7 +46,7 @@
             }
             let intervalo = setInterval(() => {
                 verVideo(video, context)
-            }, 500);
+            }, 300);
         })
     </script>
 </body>
